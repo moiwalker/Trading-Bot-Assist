@@ -1,12 +1,13 @@
 """
 RichesseFX-style alert bot
 ---------------------------
-Watches EUR_USD and GBP_USD for:
-  1. Asia session (00:00-07:00 UTC) range sweep during London AM (07:00-11:00 UTC)
+Watches EUR_USD and GBP_USD all day, every day, for:
+  1. Asia session (00:00-07:00 UTC) range sweep at any point afterward
   2. MSS (Market Structure Shift) confirmation after the sweep
   3. Price retracing into the 0.5 - 0.618 Fibonacci zone of the reversal leg
 
-When all three line up, it sends you a Telegram push notification.
+Sends you a Telegram message at EACH stage as it happens (sweep -> MSS -> Fib zone entry),
+not just at the final signal. Stays silent only when nothing has happened yet.
 This is an ALERT-ONLY tool. It never places trades. You still enter manually.
 
 Data source: Twelve Data free API - free signup, no restricted-country issues, forex included.
@@ -26,8 +27,6 @@ PAIRS = {
 TD_INTERVAL = "5min"                # 5-minute candles for structure/MSS detection
 ASIA_START_HOUR = 0                # UTC
 ASIA_END_HOUR = 7                  # UTC
-LONDON_AM_START_HOUR = 7           # UTC
-LONDON_AM_END_HOUR = 11            # UTC
 FIB_LOW = 0.5
 FIB_HIGH = 0.618
 STATE_FILE = os.path.join(os.path.dirname(__file__), "state.json")
@@ -111,10 +110,6 @@ def get_asia_range(candles, now: datetime):
     return max(highs), min(lows)
 
 
-def in_london_am(now: datetime) -> bool:
-    return LONDON_AM_START_HOUR <= now.hour < LONDON_AM_END_HOUR
-
-
 def find_prior_structure_point(candles, sweep_index, direction, lookback=40):
     """
     Very simplified swing-point finder.
@@ -137,13 +132,17 @@ def analyze_pair(td_symbol: str, display_symbol: str, state: dict):
 
     pair_state = state.get(display_symbol, {})
     if pair_state.get("date") != day:
-        # New day - reset
-        pair_state = {"date": day, "swept": None, "sweep_price": None, "sweep_index": None,
-                       "mss_confirmed": False, "leg_extreme": None, "alerted": False}
+        # New day - reset everything, including notification flags
+        pair_state = {
+            "date": day, "swept": None, "sweep_price": None, "sweep_index": None,
+            "mss_confirmed": False, "leg_extreme": None, "alerted": False,
+            "sweep_notified": False, "mss_notified": False,
+        }
 
-    if not in_london_am(now):
-        state[display_symbol] = pair_state
-        return
+    # Safety net: if state.json was written by an older version of this script,
+    # make sure the newer fields exist so nothing crashes today.
+    pair_state.setdefault("sweep_notified", False)
+    pair_state.setdefault("mss_notified", False)
 
     candles = fetch_candles(td_symbol, count=300)
     if len(candles) < 50:
@@ -152,22 +151,34 @@ def analyze_pair(td_symbol: str, display_symbol: str, state: dict):
 
     asia_range = get_asia_range(candles, now)
     if asia_range is None:
+        # Still inside today's Asia session (00:00-07:00 UTC) - range isn't set yet, nothing to do
         state[display_symbol] = pair_state
         return
     asia_high, asia_low = asia_range
 
-    london_candles = [(i, c) for i, c in enumerate(candles)
-                       if c["time"].hour >= LONDON_AM_START_HOUR and c["time"].date() == now.date()]
+    # Candles from the moment Asia session closed today, onward - this is the whole watch window
+    watch_candles = [(i, c) for i, c in enumerate(candles)
+                      if c["time"].date() == now.date() and c["time"].hour >= ASIA_END_HOUR]
 
     # 1. Detect sweep (only look for the first one today)
     if pair_state["swept"] is None:
-        for i, c in london_candles:
+        for i, c in watch_candles:
             if c["high"] > asia_high:
                 pair_state.update({"swept": "high", "sweep_price": c["high"], "sweep_index": i})
                 break
             if c["low"] < asia_low:
                 pair_state.update({"swept": "low", "sweep_price": c["low"], "sweep_index": i})
                 break
+
+        if pair_state["swept"] and not pair_state["sweep_notified"]:
+            direction_txt = "Asia HIGH swept — expecting reversal DOWN" if pair_state["swept"] == "high" \
+                else "Asia LOW swept — expecting reversal UP"
+            send_telegram(
+                f"⏳ {display_symbol}\n"
+                f"{direction_txt}\n"
+                f"Watching for MSS confirmation now..."
+            )
+            pair_state["sweep_notified"] = True
 
     # 2. Detect MSS confirmation (only after a sweep, and not yet confirmed)
     if pair_state["swept"] and not pair_state["mss_confirmed"]:
@@ -185,13 +196,22 @@ def analyze_pair(td_symbol: str, display_symbol: str, state: dict):
                 pair_state["mss_confirmed"] = True
                 pair_state["leg_extreme"] = c["low"]
                 break
-            # Invalidation: price re-sweeps further beyond original extreme -> reset and look again
+            # Invalidation: price re-sweeps further beyond original extreme -> keep tracking new extreme
             if pair_state["swept"] == "low" and c["low"] < pair_state["sweep_price"]:
                 pair_state["sweep_price"] = c["low"]
             if pair_state["swept"] == "high" and c["high"] > pair_state["sweep_price"]:
                 pair_state["sweep_price"] = c["high"]
 
-    # 3. Update running leg extreme + check Fib retracement zone
+        if pair_state["mss_confirmed"] and not pair_state["mss_notified"]:
+            bias_txt = "bullish (buy bias)" if pair_state["swept"] == "low" else "bearish (sell bias)"
+            send_telegram(
+                f"🔎 {display_symbol}\n"
+                f"MSS confirmed — {bias_txt}\n"
+                f"Watching for retracement into the 0.5-0.618 Fib zone..."
+            )
+            pair_state["mss_notified"] = True
+
+    # 3. Update running leg extreme + check Fib retracement zone -> final entry alert
     if pair_state["mss_confirmed"] and not pair_state["alerted"]:
         recent = candles[-10:]
         if pair_state["swept"] == "low":
