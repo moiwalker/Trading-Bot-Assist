@@ -17,7 +17,7 @@
     "sweep_index": 294,
     "mss_confirmed": true,
     "leg_extreme": 1.33553,
-    "alerted": false,
+    "alerted": true,
     "sweep_notified": true,
     "mss_notified": true
   }
