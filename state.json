@@ -12,13 +12,13 @@
   },
   "GBPUSD": {
     "date": "2026-07-30",
-    "swept": null,
-    "sweep_price": null,
-    "sweep_index": null,
+    "swept": "high",
+    "sweep_price": 1.34059,
+    "sweep_index": 251,
     "mss_confirmed": false,
     "leg_extreme": null,
     "alerted": false,
-    "sweep_notified": false,
+    "sweep_notified": true,
     "mss_notified": false
   }
 }
