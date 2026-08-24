@@ -13,7 +13,7 @@
   "GBPUSD": {
     "date": "2026-08-24",
     "swept": "low",
-    "sweep_price": 1.36269,
+    "sweep_price": 1.3625,
     "sweep_index": 295,
     "mss_confirmed": false,
     "leg_extreme": null,
