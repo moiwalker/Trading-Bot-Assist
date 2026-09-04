@@ -2,7 +2,7 @@
   "EURUSD": {
     "date": "2026-09-04",
     "swept": "low",
-    "sweep_price": 1.16179,
+    "sweep_price": 1.15848,
     "sweep_index": 277,
     "mss_confirmed": false,
     "leg_extreme": null,
@@ -16,8 +16,8 @@
     "sweep_price": 1.35498,
     "sweep_index": 271,
     "mss_confirmed": true,
-    "leg_extreme": 1.35229,
-    "alerted": false,
+    "leg_extreme": 1.34948,
+    "alerted": true,
     "sweep_notified": true,
     "mss_notified": true
   }
