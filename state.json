@@ -1,24 +1,24 @@
 {
   "EURUSD": {
-    "date": "2026-09-30",
-    "swept": "high",
-    "sweep_price": 1.13797,
-    "sweep_index": 224,
-    "mss_confirmed": true,
-    "leg_extreme": 1.13227,
+    "date": "2026-10-01",
+    "swept": null,
+    "sweep_price": null,
+    "sweep_index": null,
+    "mss_confirmed": false,
+    "leg_extreme": null,
     "alerted": false,
-    "sweep_notified": true,
-    "mss_notified": true
+    "sweep_notified": false,
+    "mss_notified": false
   },
   "GBPUSD": {
-    "date": "2026-09-30",
-    "swept": "high",
-    "sweep_price": 1.32901,
-    "sweep_index": 280,
-    "mss_confirmed": true,
-    "leg_extreme": 1.32563,
+    "date": "2026-10-01",
+    "swept": null,
+    "sweep_price": null,
+    "sweep_index": null,
+    "mss_confirmed": false,
+    "leg_extreme": null,
     "alerted": false,
-    "sweep_notified": true,
-    "mss_notified": true
+    "sweep_notified": false,
+    "mss_notified": false
   }
 }
