@@ -13,7 +13,7 @@
   "GBPUSD": {
     "date": "2026-10-04",
     "swept": "high",
-    "sweep_price": 1.32452,
+    "sweep_price": 1.32479,
     "sweep_index": 287,
     "mss_confirmed": false,
     "leg_extreme": null,
