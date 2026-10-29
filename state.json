@@ -5,7 +5,7 @@
     "sweep_price": 1.11247,
     "sweep_index": 271,
     "mss_confirmed": true,
-    "leg_extreme": 1.11528,
+    "leg_extreme": 1.11726,
     "alerted": false,
     "sweep_notified": true,
     "mss_notified": true
@@ -15,10 +15,10 @@
     "swept": "low",
     "sweep_price": 1.32954,
     "sweep_index": 271,
-    "mss_confirmed": false,
-    "leg_extreme": null,
+    "mss_confirmed": true,
+    "leg_extreme": 1.33752,
     "alerted": false,
     "sweep_notified": true,
-    "mss_notified": false
+    "mss_notified": true
   }
 }
