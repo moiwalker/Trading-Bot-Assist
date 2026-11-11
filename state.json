@@ -2,7 +2,7 @@
   "EURUSD": {
     "date": "2026-11-11",
     "swept": "low",
-    "sweep_price": 1.10911,
+    "sweep_price": 1.1087,
     "sweep_index": 289,
     "mss_confirmed": false,
     "leg_extreme": null,
@@ -13,12 +13,12 @@
   "GBPUSD": {
     "date": "2026-11-11",
     "swept": "low",
-    "sweep_price": 1.32755,
+    "sweep_price": 1.3265,
     "sweep_index": 286,
-    "mss_confirmed": false,
-    "leg_extreme": null,
+    "mss_confirmed": true,
+    "leg_extreme": 1.32927,
     "alerted": false,
     "sweep_notified": true,
-    "mss_notified": false
+    "mss_notified": true
   }
 }
