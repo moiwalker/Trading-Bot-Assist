@@ -5,7 +5,7 @@
     "sweep_price": 1.09316,
     "sweep_index": 223,
     "mss_confirmed": true,
-    "leg_extreme": 1.09508,
+    "leg_extreme": 1.09784,
     "alerted": false,
     "sweep_notified": true,
     "mss_notified": true
@@ -13,12 +13,12 @@
   "GBPUSD": {
     "date": "2026-11-25",
     "swept": "low",
-    "sweep_price": 1.3056,
+    "sweep_price": 1.30552,
     "sweep_index": 208,
-    "mss_confirmed": false,
-    "leg_extreme": null,
+    "mss_confirmed": true,
+    "leg_extreme": 1.31177,
     "alerted": false,
     "sweep_notified": true,
-    "mss_notified": false
+    "mss_notified": true
   }
 }
